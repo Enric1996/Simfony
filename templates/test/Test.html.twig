@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}ContactsApp{% endblock %}
+
+{% block body %}
+    <style>
+        .example-wrapper {
+            margin: 1em auto;
+            max-width: 800px;
+            width: 95%;
+            font: 18px/1.5 sans-serif;
+        }
+
+        .example-wrapper code {
+            background: #F5F5F5;
+            padding: 2px 6px;
+        }
+    </style>
+
+    <div class="example-wrapper">
+        <h1>Hello {{ controller_name }}! ✅</h1>
+
+        This friendly message is coming from:
+        <ul>
+            <li>Your controller at <code>
+                    <a href="{{ 'C:/Users/Xenet-Enric/Documents/prueba-enric/src/Controller/ContactsController.php'|file_link(0) }}">src/Controller/ContactsController.php</a></code>
+            </li>
+            <li>Your template at <code>
+                    <a href="{{ 'C:/Users/Xenet-Enric/Documents/prueba-enric/templates/contacts/index.html.twig'|file_link(0) }}">templates/contacts/index.html.twig</a></code>
+            </li>
+        </ul>
+
+        <div>
+            {% if contact_with_phones is not null %}
+                <h2>Contact: {{ contact_with_phones.contact.title }} {{ contact_with_phones.contact.name }} {{ contact_with_phones.contact.surname }} </h2>
+                <ul>
+                    <li><strong>Birth date:</strong>{{ contact_with_phones.contact.birthdate }}</li>
+                    <li><strong>Email: </strong>{{ contact_with_phones.contact.email }}</li>
+                    <li><strong>Phones:</strong>
+                        <ul>
+                            {% for phone in contact_with_phones.phones %}
+                                <li>{{ phone.type }}: {{ phone.number }}</li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                </ul>
+            {% else %}
+                <h2>No contact found with id {{ contact_id }}</h2>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
