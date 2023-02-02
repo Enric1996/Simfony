@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Book App{% endblock %}
+
+{% block body %}
+    <style>
+        .example-wrapper {
+            margin: 1em auto;
+            max-width: 800px;
+            width: 95%;
+            font: 18px/1.5 sans-serif;
+        }
+
+        .example-wrapper code {
+            background: #F5F5F5;
+            padding: 2px 6px;
+        }
+    </style>
+
+    <div class="example-wrapper">
+        <h1>{{ controller_name }}!</h1>
+        <div>
+            {% if library_with_books is not null %}
+                <h2>Book: {{ title }}</h2>
+                <ul>
+                    <li><strong>ISBN: </strong>{{ book_isbn }}</li>
+                    <li><strong>Author: </strong>{{ author }}</li>
+                    <li><strong>Publisher: </strong>{{ publisher }}</li>
+                    <li><strong>Publication Data: </strong>{{ date }}</li>
+                    <li><strong>Pages: </strong>{{ pages }}</li>
+                </ul>
+            {% else %}
+                <h2>No book found with isbn {{ book_isbn }}</h2>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
