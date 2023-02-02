@@ -4,7 +4,6 @@ namespace App\Service;
 
 class LibraryData
 {
-
     private static $books = array ( 
         array("isbn" => "A111B3", "title" => "The Lord of the Rings", "author" => "J.R.R. Tolkien", 
         "pages" => 1536, "pub_date" => "2020-11-03", "publisher" => 1), 
@@ -19,17 +18,17 @@ class LibraryData
     ); 
      
     private static $publishers = array ( 
-        array ("id"=> 1, "name"=>"Clarion Books", "email"=>"info@clarion. com"), 
-        array ("id"=> 4, "name"=>"Ecco", "email"=>"ecco_info@ecco.com"), 
-        array ("id"=> 2, "name"=>"Scribner", "email"=>"scribner@scr.com") 
+        array ("id"=> 1, "name"=>"Clarion Books", "email"=>"info@clarion. com"),
+        array ("id"=> 2, "name"=>"Scribner", "email"=>"scribner@scr.com"), 
+        array ("id"=> 4, "name"=>"Ecco", "email"=>"ecco_info@ecco.com")
     );
 
-    public static function getBooks(): array
+    public function getBooks(): array
     {
         return self::$books;
     }
 
-    public static function getPublishers(): array
+    public function getPublishers(): array
     {
         return self::$publishers;
     }

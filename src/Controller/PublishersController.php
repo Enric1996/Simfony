@@ -2,47 +2,76 @@
 
 namespace App\Controller;
 
-use App\Service\LibraryData;
+use App\Service\LibraryService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-
+use App\Entity\Publisher;
+use Doctrine\Persistence\ManagerRegistry;
 class PublishersController extends AbstractController
 {
-    #[Route('/publisher/{id<\d+>}', name: 'app_publishers')]
-    public function index($id = ''): Response
+    public function __construct(private readonly LibraryService $LibraryService){
+    }
+
+    #[Route('/publisher/new/{name}/{email}', name: 'app_newPublisher', methods: ['GET'])]
+    public function newBook(ManagerRegistry $doctrine, $name='', $email=''): Response
     {
 
-        $publishers = LibraryData::getPublishers();
-        $publisher = array();
-        foreach ($publishers as $c) {
-            if ($c['id'] == $id) {
-                $publisher = $c;
-            }
-        }
-        if (empty($id)) {
-            $content = "<h2>Please,enter a publisher id</h2>";
-        } elseif (empty($publisher)) {
-            $content = "<h2>No publisher found with id $id</h2>";
-        } else {
-            $content = "
-            <h2>Publisher: {$publisher['name']}</h2> 
-            <ul> 
-                <li><strong>Email: </strong>{$publisher['email']}</li>  
-            </ul>";
-        }
-        $page = '
-                <!DOCTYPEhtml> 
-                    <html> 
-                    <head> 
-                        <title>BooksApp</title> 
-                        <meta charset="UTF-8">
-                    </head> 
-                    <body> 
-                        <h1>Library App</h1>';
-                         $page .= $content . "</body></html>";
-        return new Response($page);
-       
+        $publisher = new Publisher();
+        $publisher->setName($name);
+        $publisher->setEmail($email);
 
+        $entityManager=$doctrine->getManager();
+        $entityManager->persist($publisher);
+        $entityManager->flush();
+        
+        return $this->render('Publisher/NewPublisher.html.twig', []);
+
+    }
+
+    #[Route('/publisher/{id}', name: 'app_publishers', methods: ['GET'])]
+    public function index(ManagerRegistry $doctrine, $id): Response
+    {
+
+        $rep=$doctrine->getRepository(Publisher::class);
+        $publisher = $rep->findBy(["id"=>$id]);
+        $name='';
+        $email='';
+        if(!empty($publisher)){
+            $publisher =  $publisher[0];
+            $name = $publisher->getName();
+            $email = $publisher->getEmail();
+        }else{
+            $publisher = NULL;
+        }
+     
+       //Salida de datos.
+       return $this->render('Publisher/Publisher.html.twig', [
+           'controller_name' => 'Publisher',
+           'publisher_with_id' => $publisher,
+           'name' => $name,
+           'email' => $email,
+           'publisher_id' => $id,
+       ]);
+    }
+
+    #[Route('/publisher', name: 'app_publisher_no_id', methods: ['GET'])]
+    public function noId(): Response
+    {
+        return $this->render('Publisher/PublisherNoId.html.twig', ['controller_name' => 'Publisher no id',]);
+    }
+
+    #[Route('/publisher_list', name: 'publisher_list', methods: ['GET'])]
+    public function publisher_list(ManagerRegistry $doctrine): Response
+    {
+
+
+        $rep=$doctrine->getRepository(Publisher::class);
+        $publishers = $rep->findAll();
+        
+
+        return $this->render('Publisher/Publisher_list.html.twig', [
+            'publishers' => $publishers,
+        ]);
     }
 }

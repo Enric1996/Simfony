@@ -4,7 +4,6 @@ namespace App\Service;
 
 class ContactData
 {
-
     private static array $contacts = array(
         array(
             "id" => 11, "title" => "Mr.", "name" => "Mike", "surname" => "Molina",
@@ -31,12 +30,12 @@ class ContactData
         array("idContact" => 9, "number" => "667889888", "type" => "Mobile")
     );
 
-    public static function getContacts(): array
+    public function getContacts(): array
     {
         return self::$contacts;
     }
 
-    public static function getPhones(): array
+    public function getPhones(): array
     {
         return self::$phones;
     }

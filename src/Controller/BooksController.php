@@ -2,49 +2,118 @@
 
 namespace App\Controller;
 
-use App\Service\LibraryData;
+use App\Service\LibraryService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Entity\Book;
+use App\Entity\Publisher;
+use Doctrine\Persistence\ManagerRegistry;
+use src\Repository\BookRepository;
 
 class BooksController extends AbstractController
 {
-    #[Route('/book/{isbn}', name: 'app_books')]
-    public function index($isbn=''): Response
-    {
-      
-        $books = LibraryData::getBooks();
-        $book = array();
-        foreach ($books as $c) {
-            if ($c['isbn'] === $isbn) {
-                $book = $c;
-            }
-        }
-        if (empty($isbn)) {
-            $content = "<h2>Please,enter a book isbn</h2>";
-        } elseif (empty($book)) {
-            $content = "<h2>No book found with isbn $isbn</h2>";
-        } else {
-            $content = "
-            <h2>Book: {$book['title']}</h2> 
-            <ul> 
-                <li><strong>Author: </strong>{$book['author']}</li> 
-                <li><strong>Publisher: </strong>{$book['publisher']}</li> 
-                <li><strong>Publication Data: {$book['pub_date']}</strong></li>
-                <li><strong>Pages: {$book['pages']}</strong></li> 
-                <li><strong>ISBN: {$book['isbn']}</strong></li>  
-            </ul>";
-        }
-        $page = '
-                <!DOCTYPEhtml> 
-                    <html> 
-                    <head> 
-                        <title>BooksApp</title> 
-                        <meta charset="UTF-8">
-                    </head> 
-                    <body> 
-                        <h1>Library App</h1>';
-                         $page .= $content . "</body></html>";
-        return new Response($page);
+
+    public function __construct(private readonly LibraryService $LibraryService){
     }
+
+    #[Route('/book/new/{isbn}/{title}/{author}/{pages}/{pubdate}/{publisher}', name: 'app_newbook', methods: ['GET'])]
+    public function newBook(ManagerRegistry $doctrine, $isbn='', $title='', $author='', $pages='', $pubdate='', $publisher=''): Response
+    {
+
+        $book = new Book();
+        $book->setIsbn($isbn);
+        $book->setTitle($title);
+        $book->setAuthor($author);
+        $book->setPages($pages);
+        $book->setPubDate($pubdate);
+        $book->setPublisher($publisher);
+
+        $entityManager=$doctrine->getManager();
+        $entityManager->persist($book);
+        $entityManager->flush();
+        
+        return $this->render('Library/newBook.html.twig', []);
+
+    }
+
+    #[Route('/book/{isbn}', name: 'app_getBookByIsbn', methods: ['GET'])]
+    public function getBookByIsbn(ManagerRegistry $doctrine, $isbn): Response
+    {
+
+        $rep=$doctrine->getRepository(Book::class);
+        $book=$rep->findBy(["isbn"=>$isbn]);
+        $book=  $book[0];
+       
+        $title = $book->getTitle();
+        $author = $book->getAuthor();
+        $pages = $book->getPages();
+        $date = $book->getPubDate();
+        $publisher = $book->getPublisher();
+       
+        //Salida de datos.
+        return $this->render('Library/Books.html.twig', [
+            'controller_name' => 'Library App', 
+            'library_with_books' => $book,
+            'book_isbn' => $isbn,
+            'title' => $title,
+            'author'=> $author,
+            'pages' => $pages,
+            'date' => $date,
+            'publisher' => $publisher
+        ]);
+    }
+
+    #[Route('/bookList', name: 'app_booksList', methods: ['GET'])]
+    public function bookList(ManagerRegistry $doctrine): Response
+    {
+
+        $rep=$doctrine->getRepository(Book::class);
+        $book=$rep->findAll();
+    
+
+        $repa=$doctrine->getRepository(Publisher::class);
+        $publishers = $repa->findAll();
+
+        return $this->render('Library/Books_list.html.twig', [
+            'books' => $book,
+            'publishers' => $publishers,
+            'page_title' => 'My Library App - Books List'
+        ]);
+    }
+
+
+    // #[Route('/book/search/{title}/{author}', name: 'app_getBookByIsbn', methods: ['GET'])]
+    // public function getBooksByTitleAuthor(ManagerRegistry $doctrine, $title='', $author=''): Response
+    // {
+    //     $rep=$doctrine->getRepository(Book::class);
+    //     $book=$rep->findByTitleAuthor(["title"=>$title]);
+    //     //$book=  $book[0];
+       
+    //     $title = $book->getTitle();
+    //     $author = $book->getAuthor();
+    //     $pages = $book->getPages();
+    //     $date = $book->getPubDate();
+    //     $publisher = $book->getPublisher();
+       
+    //     //Salida de datos.
+    //     return $this->render('Library/Books.html.twig', [
+    //         'controller_name' => 'Library App', 
+    //         'library_with_books' => $book,
+    //         'book_isbn' => $isbn,
+    //         'title' => $title,
+    //         'author'=> $author,
+    //         'pages' => $pages,
+    //         'date' => $date,
+    //         'publisher' => $publisher
+    //     ]);
+    // }
+
+   
+    #[Route('/book', name: 'app_books_no_id', methods: ['GET'])]
+    public function noIsbn(): Response
+    {
+        return $this->render('Library/BooksNoIsbn.html.twig', ['controller_name' => 'Library no id',]);
+    }
+
 }
