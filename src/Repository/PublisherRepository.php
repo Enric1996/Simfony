@@ -39,6 +39,17 @@ class PublisherRepository extends ServiceEntityRepository
         }
     }
 
+    public function findByName(string $name): ?array {
+        $queryBuilder = $this->createQueryBuilder('publisher');
+     
+              $query = $queryBuilder
+                 ->where($queryBuilder->expr()->like('publisher.name',':name'))
+                 ->setParameter('name','%'.$name.'%')
+                 ->getQuery();
+     
+              return $query->getResult();
+     }
+
 //    /**
 //     * @return Publisher[] Returns an array of Publisher objects
 //     */

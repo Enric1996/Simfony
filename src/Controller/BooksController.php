@@ -83,37 +83,33 @@ class BooksController extends AbstractController
     }
 
 
-    // #[Route('/book/search/{title}/{author}', name: 'app_getBookByIsbn', methods: ['GET'])]
-    // public function getBooksByTitleAuthor(ManagerRegistry $doctrine, $title='', $author=''): Response
-    // {
-    //     $rep=$doctrine->getRepository(Book::class);
-    //     $book=$rep->findByTitleAuthor(["title"=>$title]);
-    //     //$book=  $book[0];
-       
-    //     $title = $book->getTitle();
-    //     $author = $book->getAuthor();
-    //     $pages = $book->getPages();
-    //     $date = $book->getPubDate();
-    //     $publisher = $book->getPublisher();
-       
-    //     //Salida de datos.
-    //     return $this->render('Library/Books.html.twig', [
-    //         'controller_name' => 'Library App', 
-    //         'library_with_books' => $book,
-    //         'book_isbn' => $isbn,
-    //         'title' => $title,
-    //         'author'=> $author,
-    //         'pages' => $pages,
-    //         'date' => $date,
-    //         'publisher' => $publisher
-    //     ]);
-    // }
+    #[Route('/book/search/{title}/{author}', name: 'app_getBookByIsbn', methods: ['GET'])]
+    public function getBooksByTitleAuthor(ManagerRegistry $doctrine, $title='', $author=''): Response
+    {
+        /** @var BookRepository $repository **/
+        $repository=$doctrine->getRepository(Book::class);
+        $book=$repository->findByTitleAuthor($title, $author);
+
+        $repa=$doctrine->getRepository(Publisher::class);
+        $publishers = $repa->findAll();
+
+
+        if($book == NULL){
+            return $this->render('Library/BooksNoIsbn.html.twig', ['controller_name' => 'Library no Results',]);
+        }
+        //Salida de datos.
+        return $this->render('Library/Books_list.html.twig', [
+            'books' => $book,
+            'publishers' => $publishers,
+            'page_title' => 'My Library App - Books List'
+        ]);
+    }
 
    
     #[Route('/book', name: 'app_books_no_id', methods: ['GET'])]
     public function noIsbn(): Response
     {
-        return $this->render('Library/BooksNoIsbn.html.twig', ['controller_name' => 'Library no id',]);
+        return $this->render('Library/BooksNoIsbn.html.twig', ['controller_name' => 'Library no ISBN',]);
     }
 
 }

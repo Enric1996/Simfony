@@ -10,9 +10,8 @@ use App\Entity\Publisher;
 use Doctrine\Persistence\ManagerRegistry;
 class PublishersController extends AbstractController
 {
-    public function __construct(private readonly LibraryService $LibraryService){
-    }
 
+    //NUEVO PUBLISHER
     #[Route('/publisher/new/{name}/{email}', name: 'app_newPublisher', methods: ['GET'])]
     public function newBook(ManagerRegistry $doctrine, $name='', $email=''): Response
     {
@@ -29,6 +28,7 @@ class PublishersController extends AbstractController
 
     }
 
+    // FIND PUBLISHER
     #[Route('/publisher/{id}', name: 'app_publishers', methods: ['GET'])]
     public function index(ManagerRegistry $doctrine, $id): Response
     {
@@ -55,12 +55,14 @@ class PublishersController extends AbstractController
        ]);
     }
 
+    // NO ID PUBLISHER
     #[Route('/publisher', name: 'app_publisher_no_id', methods: ['GET'])]
     public function noId(): Response
     {
         return $this->render('Publisher/PublisherNoId.html.twig', ['controller_name' => 'Publisher no id',]);
     }
 
+    // PUBLISHER LIST
     #[Route('/publisher_list', name: 'publisher_list', methods: ['GET'])]
     public function publisher_list(ManagerRegistry $doctrine): Response
     {
@@ -74,4 +76,34 @@ class PublishersController extends AbstractController
             'publishers' => $publishers,
         ]);
     }
+
+    // PUBLISHER SEARCH
+    #[Route('/publisher/search/{name}', name: 'app_getPublisherByName', methods: ['GET'])]
+    public function getPublisherByName(ManagerRegistry $doctrine, $name='', ): Response
+    {
+        /** @var PubliserRepository $repository **/
+        $repository=$doctrine->getRepository(Publisher::class);
+        $publishers=$repository->findByName($name);
+
+        if($publishers == NULL){
+            return $this->render('Publisher/PublisherNoId.html.twig', ['controller_name' => 'Library no Publisher Results',]);
+        }
+        //Salida de datos.
+        return $this->render('Publisher/Publisher_list.html.twig', [
+            'publishers' => $publishers,
+            'page_title' => 'My Library App - Publisher List'
+        ]);
+    }
+
+    // PUBLISHER UPDATE
+    // #[Route('/publisher/search/{name}', name: 'app_getPublisherByName', methods: ['GET'])]
+    // public function UpdatePublisher(ManagerRegistry $doctrine, $id, ): Response
+    // {
+
+    //     if ($publishers == NULL) {
+    //         return $this->render('Publisher/PublisherNoId.html.twig', ['controller_name' => 'Library no Publisher Results',]);
+    //     }
+
+    // }
+
 }

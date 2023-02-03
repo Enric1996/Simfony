@@ -39,14 +39,31 @@ class BookRepository extends ServiceEntityRepository
         }
     }
     
-    public function findByTitleAuthor($title,$author) {
-        return $this->createQueryBuilder('book')
-        ->andWhere('book.title LIKE :tit AND book.author LIKE :aut')
-        ->setParameter('tit', '%'.$title.'%')
-        ->setParameter('aut', '%'.$author.'%')
-        ->getQuery()
-        ->getResult();
-    }
+    // public function findByTitleAuthor(string $title,string $author): ?array {
+    //     $queryBuilder = $this->createQueryBuilder('attribute_variation_attribute');
+     
+    //           $query = $queryBuilder
+    //              ->where($queryBuilder->expr()->like('book.title',':title'))
+    //              ->andWhere($queryBuilder->expr()->like('book.author',':author'))
+    //              ->setParameter('title','%'.$title.'%')
+    //              ->setParameter('author','%'.$author.'%')
+    //              ->getQuery();
+     
+    //           return $query->getResult();
+    //  }
+
+     public function findByTitleAuthor(string $title,string $author): ?array {
+        $queryBuilder = $this->createQueryBuilder('book');
+     
+              $query = $queryBuilder
+                 ->where($queryBuilder->expr()->like('book.title',':title'))
+                 ->andWhere($queryBuilder->expr()->like('book.author',':author'))
+                 ->setParameter('title','%'.$title.'%')
+                 ->setParameter('author','%'.$author.'%')
+                 ->getQuery();
+     
+              return $query->getResult();
+     }
 
 //    /**
 //     * @return Book[] Returns an array of Book objects
