@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+{% block title %}It works!
+{% endblock %}
+{% block body %}
+	<style>
+		.example-wrapper {
+			margin: 1em auto;
+			max-width: 800px;
+			width: 95%;
+			font: 18px / 1.5 sans-serif;
+		}
+		.example-wrapper code {
+			background: #F5F5F5;
+			padding: 2px 6px;
+		}
+	</style>
+	<div class="example-wrapper">
+		<h1>{{ page_title }}!</h1>
+	</div>
+	<p>{{action}}</p>
+	<div>
+		{% if publisher is not null %}
+			<ul>
+				<li>
+					<strong>Id:</strong>
+					{{ id }}
+                </li>
+				<li>
+					<strong>Name:</strong>
+					{{ name }}
+                </li>
+				<li>
+					<strong>Email:</strong>
+					{{ email }}
+                </li>
+			</ul>
+		{% else %}
+			<h2>No contact found with this id {{ id }}</h2>
+		{% endif %}
+	</div>
+{% endblock %}

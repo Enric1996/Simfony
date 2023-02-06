@@ -112,4 +112,72 @@ class BooksController extends AbstractController
         return $this->render('Library/BooksNoIsbn.html.twig', ['controller_name' => 'Library no ISBN',]);
     }
 
+    // UPDATE BOOK 
+    #[Route('/book/edit/{isbn}/{title}/{author}/{pages}/{pubdate}/{publisher}', name: 'app_UpdateBookByIsbn')]
+    public function UpdateBook(ManagerRegistry $doctrine, $isbn = '', $title = '', $author = '', $pages = 0, $pubdate = '', $publisher = 0): Response
+    {
+        $book = $doctrine->getRepository(Book::class)->findOneBy(['isbn'=>$isbn]);
+
+        if ($book == NULL) {
+            return $this->render('Library/EditBook.html.twig', [
+                'page_title' => 'My Library App - Update Book',
+                'action' => 'Failed to modify book: no id found'
+            ]);
+        } else {
+            $entityManager = $doctrine->getManager();
+            $book->setTitle($title);
+            $book->setAuthor($author);
+            $book->setPages($pages);
+            $book->setPubDate($pubdate);
+            $book->setPublisher($publisher);
+            $entityManager->flush();
+            $action = 'Book update';
+
+            return $this->render('Library/EditBook.html.twig', [
+                'book'       => $book,
+                'isbn'       => $isbn,
+                'title'      => $title,
+                'author'     => $author,
+                'pages'      => $pages,
+                'pubdate'    => $pubdate,
+                'publisher'  => $publisher,
+                'page_title' => 'My Library App - Update Book',
+                'action'     => $action
+            ]);
+        }
+    }
+
+    // DELETE BOOK 
+    #[Route('/book/delete/{isbn}', name: 'app_DeleteBookByIsbn')]
+    public function DeleteBook(ManagerRegistry $doctrine, $isbn = ''): Response
+    {
+        $book = $doctrine->getRepository(Book::class)->findOneBy(['isbn'=>$isbn]);
+
+        if ($book == NULL) {
+            return $this->render('Library/EditBook.html.twig', [
+                'book'       => $book,
+                'isbn'       => $isbn,
+                'page_title' => 'My Library App - Delete Book',
+                'action'     => ''
+            ]);
+        } else {
+            $entityManager = $doctrine->getManager();
+            $entityManager->remove($book);
+            $entityManager->flush();
+            $action = 'Book Deleted';
+
+            return $this->render('Library/EditBook.html.twig', [
+                'book'       => $book,
+                'isbn'       => $isbn,
+                'title'      => $book->getTitle(),
+                'author'     => $book->getAuthor(),
+                'pages'      => $book->getPages(),
+                'pubdate'       => $book->getPubDate(),
+                'publisher'  => $book->getPublisher(),
+                'page_title' => 'My Library App - Delete Book',
+                'action'     => $action
+            ]);
+        }
+    }
+
 }
